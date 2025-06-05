@@ -41,12 +41,6 @@
       color: #212529;
     }
 
-    hr {
-      height: 5px;
-      opacity: 1;
-      border: none;
-    }
-
     .btn {
       font-weight: 600;
       padding: 0.6rem 1.4rem;
@@ -56,6 +50,22 @@
     #progress-bar {
       transition: width 0.4s ease-in-out;
       font-weight: bold;
+    }
+
+    hr.success {
+      border-top: 3px solid #198754;
+    }
+
+    hr.primary {
+      border-top: 3px solid #0d6efd;
+    }
+
+    hr.warning {
+      border-top: 3px solid #ffc107;
+    }
+
+    hr.purple {
+      border-top: 3px solid #6f42c1;
     }
 
     @keyframes fadeIn {
@@ -94,13 +104,16 @@
 
       <div class="mb-4">
         <p><strong>📖 Verset :</strong><span id="verset"><%- note.verset %></span></p>
-        <hr id="hr-verset">
+        <hr class="success">
+
         <p><strong>🙏 Prière :</strong><span id="priere"><%- note.prière %></span></p>
-        <hr id="hr-priere">
+        <hr class="primary">
+
         <p><strong>💬 Citation :</strong><span id="citation"><%- note.citation %></span></p>
-        <hr id="hr-citation">
+        <hr class="warning">
+
         <p><strong>📝 Note :</strong><span id="note"><%- note.note %></span></p>
-        <hr id="hr-note">
+        <hr class="purple">
       </div>
 
       <div class="progress mb-4" style="height: 1.4rem;">
@@ -117,22 +130,6 @@
 
 <script>
   let noteIndex = <%= JSON.stringify(noteIndex) %>;
-  const theme = "<%= theme %>"; // Ex : "bleu", "vert", "jaune", "violet"
-
-  const themeColors = {
-    bleu: "bg-primary",
-    vert: "bg-success",
-    jaune: "bg-warning",
-    violet: "bg-purple", // Personnalise via CSS si nécessaire
-  };
-
-  const colorClass = themeColors[theme] || "bg-primary";
-
-  // Appliquer les couleurs aux lignes
-  document.getElementById("hr-verset").classList.add(colorClass);
-  document.getElementById("hr-priere").classList.add(colorClass);
-  document.getElementById("hr-citation").classList.add(colorClass);
-  document.getElementById("hr-note").classList.add(colorClass);
 
   async function updateNote(direction) {
     let progress = 0;
