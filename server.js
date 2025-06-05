@@ -1,17 +1,71 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
-const apiRoutes = require('./routes/api');
+import express from 'express';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import { CohereClient } from 'cohere-ai';
+
+dotenv.config();
 
 const app = express();
-app.set('view engine', 'ejs');
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/api', apiRoutes);
+const port = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.render('index');
+const cohere = new CohereClient({
+  token: process.env.COHERE_API_KEY,
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server on http://localhost:${PORT}`));
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+app.use(express.json());
+
+const notes = [];
+
+async function generateNote() {
+  const prompt = `Crée une note spirituelle, un verset biblique inspiré, une prière et une citation motivante. Format JSON.`;
+  const res = await cohere.generate({
+    model: "command-r-plus",
+    prompt: prompt,
+    maxTokens: 300,
+    temperature: 0.8,
+  });
+
+  const text = res.generations[0].text;
+
+  try {
+    const note = JSON.parse(text);
+    return note;
+  } catch {
+    // fallback si le JSON est invalide
+    return {
+      verset: "Jean 3:16 - Car Dieu a tant aimé le monde...",
+      prière: "Seigneur, remplis-moi de paix et de lumière.",
+      citation: "Chaque jour est un nouveau don de Dieu.",
+      note: "Aujourd’hui, sois un canal de bénédictions pour les autres.",
+    };
+  }
+}
+
+app.get('/', async (req, res) => {
+  const note = await generateNote();
+  notes.push(note);
+  res.render('index', { noteIndex: 0, note });
+});
+
+app.post('/note', async (req, res) => {
+  const { direction, index } = req.body;
+  let noteIndex = index;
+
+  if (direction === 'next') {
+    if (!notes[noteIndex + 1]) {
+      const note = await generateNote();
+      notes.push(note);
+    }
+    noteIndex++;
+  } else if (direction === 'prev' && noteIndex > 0) {
+    noteIndex--;
+  }
+
+  res.json({ note: notes[noteIndex], index: noteIndex });
+});
+
+app.listen(port, () => {
+  console.log(`App running on http://localhost:${port}`);
+});
