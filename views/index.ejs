@@ -52,6 +52,12 @@
       font-weight: bold;
     }
 
+    hr {
+      border-top: 1px solid #dee2e6;
+      margin-top: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -88,9 +94,13 @@
 
       <div class="mb-4">
         <p><strong>📖 Verset :</strong><span id="verset"><%- note.verset %></span></p>
+        <hr>
         <p><strong>🙏 Prière :</strong><span id="priere"><%- note.prière %></span></p>
+        <hr>
         <p><strong>💬 Citation :</strong><span id="citation"><%- note.citation %></span></p>
+        <hr>
         <p><strong>📝 Note :</strong><span id="note"><%- note.note %></span></p>
+        <hr>
       </div>
 
       <div class="progress mb-4" style="height: 1.4rem;">
