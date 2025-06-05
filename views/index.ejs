@@ -4,23 +4,96 @@
   <meta charset="UTF-8">
   <title>Note Spirituelle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
 
-<div class="container mt-5">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+    }
+
+    h3 {
+      font-weight: 700;
+    }
+
+    .card {
+      border: none;
+      background: #ffffff;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .card-body p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-body span {
+      display: block;
+      margin-top: 0.4rem;
+      font-weight: 500;
+      color: #212529;
+    }
+
+    .btn {
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      font-size: 1rem;
+    }
+
+    #progress-bar {
+      transition: width 0.4s ease-in-out;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 576px) {
+      h3 {
+        font-size: 1.5rem;
+      }
+
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .btn:last-child {
+        margin-bottom: 0;
+      }
+
+      .text-center {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
   <div class="card shadow-lg rounded-4">
-    <div class="card-body p-4">
+    <div class="card-body p-5">
       <h3 class="text-center text-primary mb-4">🌿 Note Spirituelle du Jour</h3>
 
-      <div class="mb-3">
-        <p><strong>📖 Verset :</strong><br><span id="verset"><%- note.verset %></span></p>
-        <p><strong>🙏 Prière :</strong><br><span id="priere"><%- note.prière %></span></p>
-        <p><strong>💬 Citation :</strong><br><span id="citation"><%- note.citation %></span></p>
-        <p><strong>📝 Note :</strong><br><span id="note"><%- note.note %></span></p>
+      <div class="mb-4">
+        <p><strong>📖 Verset :</strong><span id="verset"><%- note.verset %></span></p>
+        <p><strong>🙏 Prière :</strong><span id="priere"><%- note.prière %></span></p>
+        <p><strong>💬 Citation :</strong><span id="citation"><%- note.citation %></span></p>
+        <p><strong>📝 Note :</strong><span id="note"><%- note.note %></span></p>
       </div>
 
-      <div class="progress mb-4">
+      <div class="progress mb-4" style="height: 1.4rem;">
         <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%">0%</div>
       </div>
 
@@ -48,7 +121,7 @@
         progressBar.style.width = progress + "%";
         progressBar.textContent = progress + "%";
       }
-    }, 150);
+    }, 100);
 
     try {
       const res = await fetch('/note', {
