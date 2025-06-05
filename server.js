@@ -14,10 +14,10 @@ app.use(express.json());
 const notes = [];
 
 async function generateNote() {
-  const prompt = `Crée une note spirituelle au format JSON contenant uniquement les champs suivants, sans texte avant ni après :
+  const prompt = `Crée  20 notes spirituelle au format JSON contenant uniquement les champs suivants, sans texte avant ni après :
   {
     verset: "un verset biblique inspirant, sans parenthèses ni citations supplémentaires",
-    prière: "une courte prière",
+    prière: "une inspiré  prière",
     citation: "une citation motivante sans guillemets ni nom d’auteur à l’intérieur",
     note: "une courte réflexion spirituelle du jour"
   }`;
