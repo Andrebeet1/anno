@@ -1,7 +1,8 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { CohereClient } from 'cohere-ai';
+import pkg from 'cohere-ai'; // ✅ Import par défaut
+const { CohereClient } = pkg; // ✅ Déstructuration
 
 dotenv.config();
 
