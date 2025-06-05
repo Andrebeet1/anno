@@ -15,12 +15,14 @@ const notes = [];
 
 async function generateNote() {
   const prompt = `Crée  20 notes spirituelle au format JSON contenant uniquement les champs suivants, sans texte avant ni après :
-  {
+ [ 
+ {
     verset: "un verset biblique inspirant, sans parenthèses ni citations supplémentaires",
     prière: "une inspiré  prière",
     citation: "une citation motivante sans guillemets ni nom d’auteur à l’intérieur",
     note: "une courte réflexion spirituelle du jour"
-  }`;
+  }
+  ]`;
 
   try {
     const response = await axios.post(
@@ -64,12 +66,14 @@ async function generateNote() {
 }
 
 function getDefaultNote() {
-  return {
+  return [
+    {
     verset: "Jean 3:16 - Car Dieu a tant aimé le monde...",
     prière: "Seigneur, remplis-moi de paix et de lumière.",
     citation: "Chaque jour est un nouveau don de Dieu.",
     note: "Aujourd’hui, sois un canal de bénédictions pour les autres.",
-  };
+  }
+    ];
 }
 
 app.get('/', async (req, res) => {
