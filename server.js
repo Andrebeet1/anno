@@ -14,7 +14,13 @@ app.use(express.json());
 const notes = [];
 
 async function generateNote() {
-  const prompt = `Crée une note spirituelle, un verset biblique inspiré, une prière et une citation motivante. Format JSON.`;
+  const prompt = `Crée une note spirituelle au format JSON contenant :
+  {
+    "verset": "un verset biblique inspirant",
+    "prière": "une courte prière",
+    "citation": "une citation motivante",
+    "note": "une courte réflexion spirituelle du jour"
+  }`;
 
   try {
     const response = await axios.post(
@@ -33,12 +39,19 @@ async function generateNote() {
       }
     );
 
-    const text = response.data.generations[0].text;
+    let text = response.data.generations[0].text.trim();
+
+    // Affiche pour déboguer la réponse brute
+    console.log("Texte brut retourné par l'API:", text);
+
+    // Correction automatique si nécessaire
+    if (!text.startsWith('{')) text = '{' + text;
+    if (!text.endsWith('}')) text += '}';
 
     try {
       return JSON.parse(text);
     } catch (e) {
-      console.error("Erreur JSON parse:", e);
+      console.error("Erreur JSON parse:", e.message);
       return getDefaultNote();
     }
   } catch (error) {
