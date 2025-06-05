@@ -14,15 +14,15 @@ app.use(express.json());
 const notes = [];
 
 async function generateNote() {
-  const prompt = `Crée  20 notes spirituelle au format JSON contenant uniquement les champs suivants, sans texte avant ni après :
- [ 
- {
-    verset: "un verset biblique inspirant, sans parenthèses ni citations supplémentaires",
-    prière: "une inspiré  prière",
-    citation: "une citation motivante sans guillemets ni nom d’auteur à l’intérieur",
-    note: "une courte réflexion spirituelle du jour"
+  const prompt = `Fournis uniquement un tableau JSON contenant exactement 1 à 2 objets avec les champs suivants :
+[
+  {
+    "verset": "Un verset biblique inspirant, sans parenthèses ni guillemets à l’intérieur",
+    "prière": "Une prière simple et inspirée",
+    "citation": "Une citation motivante sans guillemets ni auteur",
+    "note": "Une courte réflexion spirituelle du jour"
   }
-  ]`;
+]`;
 
   try {
     const response = await axios.post(
@@ -30,7 +30,7 @@ async function generateNote() {
       {
         model: "command-r-plus",
         prompt: prompt,
-        max_tokens: 300,
+        max_tokens: 600,
         temperature: 0.8,
       },
       {
@@ -41,26 +41,24 @@ async function generateNote() {
       }
     );
 
-    let text = response.data.generations[0].text.trim();
+    const text = response.data.generations[0].text.trim();
 
-    console.log("Texte brut retourné par l'API:", text);
+    // Extraire uniquement la partie entre crochets
+    const start = text.indexOf('[');
+    const end = text.lastIndexOf(']');
+    if (start === -1 || end === -1) throw new Error("Format inattendu");
 
-    // Force correction basique du JSON
-    if (!text.startsWith('{')) text = '{' + text;
-    if (!text.endsWith('}')) text += '}';
-
-    // Supprime les caractères invalides ou noms d’auteurs entre guillemets mal fermés
-    text = text.replace(/,\s*("[^"]+":\s*".+?)["“”]?[.,)]?/g, '$1"'); // tente de fermer correctement
+    const cleanText = text.substring(start, end + 1);
 
     try {
-      const note = JSON.parse(text);
-      return note;
+      const json = JSON.parse(cleanText);
+      return json;
     } catch (e) {
-      console.error("❌ Erreur JSON parse:", e.message);
+      console.error("❌ JSON mal formé :", e.message);
       return getDefaultNote();
     }
   } catch (error) {
-    console.error("❌ Erreur Cohere API:", error.message);
+    console.error("❌ Erreur API Cohere:", error.message);
     return getDefaultNote();
   }
 }
@@ -68,16 +66,17 @@ async function generateNote() {
 function getDefaultNote() {
   return [
     {
-    verset: "Jean 3:16 - Car Dieu a tant aimé le monde...",
-    prière: "Seigneur, remplis-moi de paix et de lumière.",
-    citation: "Chaque jour est un nouveau don de Dieu.",
-    note: "Aujourd’hui, sois un canal de bénédictions pour les autres.",
-  }
-    ];
+      verset: "Jean 3:16 - Car Dieu a tant aimé le monde...",
+      prière: "Seigneur, remplis-moi de paix et de lumière.",
+      citation: "Chaque jour est un nouveau don de Dieu.",
+      note: "Aujourd’hui, sois un canal de bénédictions pour les autres."
+    }
+  ];
 }
 
 app.get('/', async (req, res) => {
-  const note = await generateNote();
+  const noteSet = await generateNote();
+  const note = noteSet[0]; // On affiche la première
   notes.push(note);
   res.render('index', { noteIndex: 0, note });
 });
@@ -88,8 +87,8 @@ app.post('/note', async (req, res) => {
 
   if (direction === 'next') {
     if (!notes[noteIndex + 1]) {
-      const note = await generateNote();
-      notes.push(note);
+      const newNotes = await generateNote();
+      notes.push(newNotes[0]);
     }
     noteIndex++;
   } else if (direction === 'prev' && noteIndex > 0) {
