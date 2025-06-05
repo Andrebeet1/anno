@@ -14,10 +14,10 @@
       <h3 class="text-center text-primary mb-4">🌿 Note Spirituelle du Jour</h3>
 
       <div class="mb-3">
-        <p><strong>📖 Verset :</strong><br><span id="verset"><%= note.verset %></span></p>
-        <p><strong>🙏 Prière :</strong><br><span id="priere"><%= note.prière %></span></p>
-        <p><strong>💬 Citation :</strong><br><span id="citation"><%= note.citation %></span></p>
-        <p><strong>📝 Note :</strong><br><span id="note"><%= note.note %></span></p>
+        <p><strong>📖 Verset :</strong><br><span id="verset"><%- note.verset %></span></p>
+        <p><strong>🙏 Prière :</strong><br><span id="priere"><%- note.prière %></span></p>
+        <p><strong>💬 Citation :</strong><br><span id="citation"><%- note.citation %></span></p>
+        <p><strong>📝 Note :</strong><br><span id="note"><%- note.note %></span></p>
       </div>
 
       <div class="progress mb-4">
@@ -33,12 +33,14 @@
 </div>
 
 <script>
-  let noteIndex = <%= noteIndex %>;
+  let noteIndex = <%= JSON.stringify(noteIndex) %>;
 
   async function updateNote(direction) {
     let progress = 0;
     const progressBar = document.getElementById('progress-bar');
     progressBar.classList.add('progress-bar-animated');
+    progressBar.classList.remove('bg-danger');
+    progressBar.classList.add('bg-success');
 
     const interval = setInterval(() => {
       if (progress < 90) {
