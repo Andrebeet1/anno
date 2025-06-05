@@ -17,7 +17,7 @@ async function generateNote() {
   const prompt = `Fournis uniquement un tableau JSON contenant exactement 1 à 2 objets avec les champs suivants :
 [
   {
-    "verset": "Un verset biblique inspirant, sans parenthèses ni guillemets à l’intérieur",
+    "verset": "Un verset biblique inspirant avec La référence biblique en grand à la fin comme une signature divine , sans parenthèses ni guillemets à l’intérieur",
     "prière": "Une prière simple et inspirée",
     "citation": "Une citation motivante sans guillemets ni auteur",
     "note": "Une courte réflexion spirituelle du jour"
@@ -41,24 +41,19 @@ async function generateNote() {
       }
     );
 
-    const text = response.data.generations[0].text.trim();
+    const raw = response.data?.generations?.[0]?.text?.trim();
+    if (!raw) throw new Error("Réponse vide ou invalide de l'API");
 
-    // Extraire uniquement la partie entre crochets
-    const start = text.indexOf('[');
-    const end = text.lastIndexOf(']');
-    if (start === -1 || end === -1) throw new Error("Format inattendu");
+    const start = raw.indexOf('[');
+    const end = raw.lastIndexOf(']');
+    if (start === -1 || end === -1) throw new Error("Format JSON non détecté");
 
-    const cleanText = text.substring(start, end + 1);
+    const cleanText = raw.substring(start, end + 1);
+    const json = JSON.parse(cleanText);
 
-    try {
-      const json = JSON.parse(cleanText);
-      return json;
-    } catch (e) {
-      console.error("❌ JSON mal formé :", e.message);
-      return getDefaultNote();
-    }
+    return json;
   } catch (error) {
-    console.error("❌ Erreur API Cohere:", error.message);
+    console.error("❌ Erreur API ou parsing :", error.message);
     return getDefaultNote();
   }
 }
@@ -76,7 +71,7 @@ function getDefaultNote() {
 
 app.get('/', async (req, res) => {
   const noteSet = await generateNote();
-  const note = noteSet[0]; // On affiche la première
+  const note = noteSet[0];
   notes.push(note);
   res.render('index', { noteIndex: 0, note });
 });
@@ -98,6 +93,7 @@ app.post('/note', async (req, res) => {
   res.json({ note: notes[noteIndex], index: noteIndex });
 });
 
-app.listen(port, () => {
-  console.log(`✅ App running on http://localhost:${port}`);
+// ✅ Important : écoute sur 0.0.0.0 pour Render
+app.listen(port, '0.0.0.0', () => {
+  console.log(`✅ App running on http://0.0.0.0:${port}`);
 });
