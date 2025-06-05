@@ -16,10 +16,10 @@ const notes = [];
 async function generateNote() {
   const prompt = `Crée une note spirituelle au format JSON contenant uniquement les champs suivants, sans texte avant ni après :
   {
-    "verset": "un verset biblique inspirant, sans parenthèses ni citations supplémentaires",
-    "prière": "une courte prière",
-    "citation": "une citation motivante sans guillemets ni nom d’auteur à l’intérieur",
-    "note": "une courte réflexion spirituelle du jour"
+    verset: "un verset biblique inspirant, sans parenthèses ni citations supplémentaires",
+    prière: "une courte prière",
+    citation: "une citation motivante sans guillemets ni nom d’auteur à l’intérieur",
+    note: "une courte réflexion spirituelle du jour"
   }`;
 
   try {
