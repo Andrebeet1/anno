@@ -17,7 +17,7 @@ async function generateNote() {
   const prompt = `Fournis uniquement un tableau JSON contenant exactement 1 à 2 objets avec les champs suivants :
 [
   {
-    "verset": "Un verset biblique inspirant avec La référence biblique en grand à la fin comme une signature divine , sans parenthèses ni guillemets à l’intérieur",
+    "verset": "Un verset biblique inspirant avec La référence biblique en grand à la ligne  , sans parenthèses ni guillemets à l’intérieur",
     "prière": "Une prière simple et inspirée",
     "citation": "Une citation motivante sans guillemets ni auteur",
     "note": "Une courte réflexion spirituelle du jour"
