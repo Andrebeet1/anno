@@ -14,13 +14,13 @@ app.use(express.json());
 const notes = [];
 
 async function generateNote() {
-  const prompt = `Crée une note spirituelle strictement au format JSON sans introduction, sans balises, sans texte autour. Exemple :
-{
-  "verset": "un verset biblique inspirant",
-  "prière": "une courte prière",
-  "citation": "une citation motivante",
-  "note": "une courte réflexion spirituelle du jour"
-}`;
+  const prompt = `Crée une note spirituelle au format JSON contenant uniquement les champs suivants, sans texte avant ni après :
+  {
+    "verset": "un verset biblique inspirant, sans parenthèses ni citations supplémentaires",
+    "prière": "une courte prière",
+    "citation": "une citation motivante sans guillemets ni nom d’auteur à l’intérieur",
+    "note": "une courte réflexion spirituelle du jour"
+  }`;
 
   try {
     const response = await axios.post(
@@ -41,29 +41,22 @@ async function generateNote() {
 
     let text = response.data.generations[0].text.trim();
 
-    console.log("Texte brut retourné par l'API:", text); // 🔍 Débogage
+    console.log("Texte brut retourné par l'API:", text);
 
-    // Nettoyage de texte pour retirer les balises ```json ou autres décorations
-    if (text.startsWith("```")) {
-      text = text.replace(/```json|```/gi, '').trim();
-    }
+    // Force correction basique du JSON
+    if (!text.startsWith('{')) text = '{' + text;
+    if (!text.endsWith('}')) text += '}';
 
-    // Supprimer lignes introductives éventuelles (garde seulement JSON pur)
-    const lines = text.split('\n');
-    const jsonStartIndex = lines.findIndex(line => line.trim().startsWith('{'));
-    if (jsonStartIndex > 0) {
-      lines.splice(0, jsonStartIndex);
-      text = lines.join('\n');
-    }
+    // Supprime les caractères invalides ou noms d’auteurs entre guillemets mal fermés
+    text = text.replace(/,\s*("[^"]+":\s*".+?)["“”]?[.,)]?/g, '$1"'); // tente de fermer correctement
 
     try {
-      const parsed = JSON.parse(text);
-      return parsed;
+      const note = JSON.parse(text);
+      return note;
     } catch (e) {
       console.error("❌ Erreur JSON parse:", e.message);
       return getDefaultNote();
     }
-
   } catch (error) {
     console.error("❌ Erreur Cohere API:", error.message);
     return getDefaultNote();
