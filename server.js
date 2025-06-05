@@ -14,13 +14,13 @@ app.use(express.json());
 const notes = [];
 
 async function generateNote() {
-  const prompt = `Crée une note spirituelle au format JSON contenant :
-  {
-    "verset": "un verset biblique inspirant",
-    "prière": "une courte prière",
-    "citation": "une citation motivante",
-    "note": "une courte réflexion spirituelle du jour"
-  }`;
+  const prompt = `Crée une note spirituelle strictement au format JSON sans introduction, sans balises, sans texte autour. Exemple :
+{
+  "verset": "un verset biblique inspirant",
+  "prière": "une courte prière",
+  "citation": "une citation motivante",
+  "note": "une courte réflexion spirituelle du jour"
+}`;
 
   try {
     const response = await axios.post(
@@ -41,21 +41,31 @@ async function generateNote() {
 
     let text = response.data.generations[0].text.trim();
 
-    // Affiche pour déboguer la réponse brute
-    console.log("Texte brut retourné par l'API:", text);
+    console.log("Texte brut retourné par l'API:", text); // 🔍 Débogage
 
-    // Correction automatique si nécessaire
-    if (!text.startsWith('{')) text = '{' + text;
-    if (!text.endsWith('}')) text += '}';
+    // Nettoyage de texte pour retirer les balises ```json ou autres décorations
+    if (text.startsWith("```")) {
+      text = text.replace(/```json|```/gi, '').trim();
+    }
+
+    // Supprimer lignes introductives éventuelles (garde seulement JSON pur)
+    const lines = text.split('\n');
+    const jsonStartIndex = lines.findIndex(line => line.trim().startsWith('{'));
+    if (jsonStartIndex > 0) {
+      lines.splice(0, jsonStartIndex);
+      text = lines.join('\n');
+    }
 
     try {
-      return JSON.parse(text);
+      const parsed = JSON.parse(text);
+      return parsed;
     } catch (e) {
-      console.error("Erreur JSON parse:", e.message);
+      console.error("❌ Erreur JSON parse:", e.message);
       return getDefaultNote();
     }
+
   } catch (error) {
-    console.error("Erreur Cohere API:", error.message);
+    console.error("❌ Erreur Cohere API:", error.message);
     return getDefaultNote();
   }
 }
@@ -93,5 +103,5 @@ app.post('/note', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`App running on http://localhost:${port}`);
+  console.log(`✅ App running on http://localhost:${port}`);
 });
