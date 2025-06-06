@@ -26,22 +26,26 @@ async function generateNote() {
 
   try {
     const response = await axios.post(
-      'https://api.cohere.ai/v1/generate',
+      'https://api.groq.com/openai/v1/chat/completions',
       {
-        model: "command-r-plus",
-        prompt: prompt,
+        model: "llama3-8b-8192", // ou "llama3-70b-8192", adapte selon ton plan Groq
+        messages: [
+          { role: "system", content: "Tu es un assistant spirituel bienveillant." },
+          { role: "user", content: prompt }
+        ],
         max_tokens: 600,
         temperature: 0.8,
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
     );
 
-    const raw = response.data?.generations?.[0]?.text?.trim();
+    // Le texte Groq (OpenAI compatible) se trouve ici :
+    const raw = response.data?.choices?.[0]?.message?.content?.trim();
     if (!raw) throw new Error("Réponse vide ou invalide de l'API");
 
     const start = raw.indexOf('[');
